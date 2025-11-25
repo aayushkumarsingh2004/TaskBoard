@@ -1,13 +1,16 @@
 import { useState, useEffect } from 'react'
 import './App.css'
 
+// ⚠️ This is the link to your Live Cloud Backend
+const API_BASE = "https://taskboard-stzp.onrender.com";
+
 function App() {
   const [tasks, setTasks] = useState([])
   const [newTask, setNewTask] = useState("")
 
   // 1. FETCH DATA
   useEffect(() => {
-    fetch('http://localhost:5000/tasks')
+    fetch(`${API_BASE}/tasks`)
       .then(response => response.json())
       .then(data => setTasks(data))
       .catch(error => console.error("Error fetching tasks:", error));
@@ -18,7 +21,7 @@ function App() {
     if (newTask === "") return;
     const taskObject = { id: Date.now(), title: newTask, status: "To Do" };
 
-    fetch('http://localhost:5000/tasks', {
+    fetch(`${API_BASE}/tasks`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(taskObject)
@@ -30,13 +33,13 @@ function App() {
     });
   }
 
-  // 3. DELETE TASK (New!)
+  // 3. DELETE TASK
   const deleteTask = (id) => {
-    // Update UI immediately (Optimistic update)
+    // Update UI immediately
     setTasks(tasks.filter(task => task.id !== id));
 
     // Tell Server to delete
-    fetch(`http://localhost:5000/tasks/${id}`, {
+    fetch(`${API_BASE}/tasks/${id}`, {
       method: 'DELETE',
     });
   }
@@ -60,7 +63,7 @@ function App() {
     });
     setTasks(updatedTasks);
 
-    fetch(`http://localhost:5000/tasks/${taskId}`, {
+    fetch(`${API_BASE}/tasks/${taskId}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ status: newStatus })
@@ -76,7 +79,6 @@ function App() {
       onDragStart={(e) => handleDragStart(e, task.id)}
     >
       <span>{task.title}</span>
-      {/* The Delete Button */}
       <span 
         className="delete-btn" 
         onClick={() => deleteTask(task.id)}
